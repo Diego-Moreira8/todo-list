@@ -2,61 +2,67 @@ Imports System
 
 Module Program
     Sub Main(args As String())
-        Dim userTodoList As TodoList = New TodoList()
+        Dim todoList As TodoList = New TodoList()
 
-        'TODO: editar e apagar item
-        Dim menuOptions As MenuOption() = {
-            New MenuOption(0, "Sair"),
-            New MenuOption(1, "Ver lista"),
-            New MenuOption(2, "Adicionar item")
-        }
-
-        Dim userOptionInput As String = ""
+        Dim optionInput As String = ""
         Dim inputError As String = ""
 
         'Loop principal - mantém o programa rodando enquanto o usuário não escolher sair
         Do
-            ClearConsole()
+            RenderMainMenu(inputError)
 
-            'Mostra erro de entrada, se houver
-            If Not String.IsNullOrWhiteSpace(inputError) Then
-                Console.WriteLine($"Erro: {inputError}")
-            End If
+            inputError = ""
 
-            Console.WriteLine("Escolha uma opção no menu digitando o número correspondente e pressionando enter")
+            optionInput = Console.ReadLine().Trim()
 
-            'Mostra as opções de menu definidas
-            For Each menuOption As MenuOption In menuOptions
-                Console.WriteLine($"[{menuOption.Code}] {menuOption.Label}")
-            Next
-
-            userOptionInput = Console.ReadLine()
-
-            ClearConsole()
-
-            Select Case userOptionInput
+            Select Case optionInput
                 Case "0"
-                    Console.WriteLine("Saindo...")
+                    ClearConsole("Saindo...")
                 Case "1"
-                    PrintTodosSubmenu(menuOptions(1), userTodoList)
+                    PrintTodosSubmenu(todoList)
                 Case "2"
-                    AddTodoSubmenu(menuOptions(2), userTodoList)
+                    AddTodoSubmenu(todoList)
                 Case Else
                     inputError = "Opção inválida, tente novamente."
             End Select
-        Loop While userOptionInput <> "0"
+        Loop While optionInput <> "0"
     End Sub
 
-    Sub ClearConsole()
+    Sub ClearConsole(menuTitle As String)
         'Limpa o console e renderiza o cabeçalho
         Console.Clear()
-        Console.WriteLine("=====[ Lista de Tarefas ]=====")
+        Console.WriteLine("=====[ LISTA DE TAREFAS ]=====")
+        Console.WriteLine()
+        Console.WriteLine(menuTitle.ToUpper())
         Console.WriteLine()
     End Sub
 
-    Sub PrintTodosSubmenu(menuOption As MenuOption, todoList As TodoList)
-        Console.WriteLine(menuOption.Label.ToUpper)
-        Console.WriteLine()
+    Sub RenderMainMenu(inputError As String)
+        'TODO: editar e apagar item
+        Dim menuOptions As String() = {
+            "Sair",
+            "Ver lista",
+            "Adicionar item"
+        }
+
+        ClearConsole("MENU PRINCIPAL")
+
+        'Mostra erro de entrada, se houver
+        If Not String.IsNullOrWhiteSpace(inputError) Then
+            Console.WriteLine($"Erro: {inputError}")
+            Console.WriteLine()
+        End If
+
+        Console.WriteLine("Escolha uma opção no menu digitando o número correspondente e pressionando enter")
+
+        'Mostra as opções de menu definidas
+        For i As Integer = 0 To menuOptions.Length - 1
+            Console.WriteLine($"[{i}] {menuOptions(i)}")
+        Next
+    End Sub
+
+    Sub PrintTodosSubmenu(todoList As TodoList)
+        ClearConsole("VER TAREFAS")
 
         todoList.PrintTasks()
 
@@ -65,9 +71,8 @@ Module Program
         Console.ReadKey()
     End Sub
 
-    Sub AddTodoSubmenu(menuOption As MenuOption, todoList As TodoList)
-        Console.WriteLine(menuOption.Label.ToUpper)
-        Console.WriteLine()
+    Sub AddTodoSubmenu(todoList As TodoList)
+        ClearConsole("ADICIONAR TAREFA")
 
         Console.WriteLine("Digite uma descrição da tarefa e pressione enter:")
         Dim newTodoDescription As String = Console.ReadLine()
