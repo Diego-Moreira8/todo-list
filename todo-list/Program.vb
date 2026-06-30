@@ -1,13 +1,13 @@
 Imports System
 
 Module Program
-    Sub Main(args As String())
-        Dim todoList As TodoList = New TodoList()
+    Dim todoList As TodoList = New TodoList()
 
-        '!!!!!!!!!!!!!TEMP
-        todoList.AddTodo("Item 0")
-        todoList.AddTodo("Item 1")
-        todoList.AddTodo("Item 2")
+    Sub Main(args As String())
+        'Testes
+        'todoList.AddTodo("Item 0")
+        'todoList.AddTodo("Item 1")
+        'todoList.AddTodo("Item 2")
 
         Dim optionInput As String = ""
         Dim inputError As String = ""
@@ -22,23 +22,24 @@ Module Program
 
             Select Case optionInput
                 Case "0"
-                    ClearConsole("Saindo...")
+                    ReloadHeader("Saindo...")
                 Case "1"
-                    PrintTodosSubmenu(todoList)
+                    AddTodoSubmenu()
                 Case "2"
-                    AddTodoSubmenu(todoList)
-                Case "3"
-                    EditTodoSubmenu(todoList)
+                    EditTodoSubmenu()
                 Case Else
                     inputError = "Opção inválida, tente novamente."
             End Select
         Loop While optionInput <> "0"
     End Sub
 
-    Sub ClearConsole(menuTitle As String)
+    Sub ReloadHeader(menuTitle As String)
         'Limpa o console e renderiza o cabeçalho
+        'O cabaçalho mostra a lista de tarefas atual
         Console.Clear()
         Console.WriteLine("=====[ LISTA DE TAREFAS ]=====")
+        Console.WriteLine()
+        todoList.PrintTasks()
         Console.WriteLine()
         Console.WriteLine(menuTitle.ToUpper())
         Console.WriteLine()
@@ -54,12 +55,11 @@ Module Program
         'TODO: editar e apagar item
         Dim menuOptions As String() = {
             "Sair",
-            "Ver tarefas",
             "Adicionar tarefa",
             "Editar tarefa"
         }
 
-        ClearConsole("MENU PRINCIPAL")
+        ReloadHeader("MENU PRINCIPAL")
 
         'Mostra erro de entrada, se houver
         If Not String.IsNullOrWhiteSpace(inputError) Then
@@ -75,16 +75,8 @@ Module Program
         Next
     End Sub
 
-    Sub PrintTodosSubmenu(todoList As TodoList)
-        ClearConsole("VER TAREFAS")
-
-        todoList.PrintTasks()
-
-        PauseConsole()
-    End Sub
-
-    Sub AddTodoSubmenu(todoList As TodoList)
-        ClearConsole("ADICIONAR TAREFA")
+    Sub AddTodoSubmenu()
+        ReloadHeader("ADICIONAR TAREFA")
 
         Console.WriteLine("Digite uma descrição da tarefa e pressione enter:")
         Dim newTodoDescription As String = Console.ReadLine()
@@ -92,13 +84,13 @@ Module Program
         todoList.AddTodo(newTodoDescription)
     End Sub
 
-    Sub EditTodoSubmenu(todoList As TodoList)
+    Sub EditTodoSubmenu()
         Dim success As Boolean = False
         Dim todoId As Integer
         Dim inputError As String = ""
 
         While Not success
-            ClearConsole("EDITAR TAREFA")
+            ReloadHeader("EDITAR TAREFA")
 
             'Mostra erro, se houver
             If Not String.IsNullOrWhiteSpace(inputError) Then

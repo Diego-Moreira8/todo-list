@@ -7,15 +7,15 @@
     End Sub
 
     Public Sub PrintTasks()
+        Console.WriteLine("ID -- Descrição -- Data/Hora da Criação")
+
         If _todos.Count = 0 Then
-            Console.WriteLine("Lista vazia!")
+            Console.WriteLine("Lista vazia")
             Return
         End If
 
-        Console.WriteLine($"   ID -- Descrição -- Data/Hora da Criação")
-
         For Each todo As Todo In _todos
-            Console.WriteLine($" > {todo.Id} -- {todo.Description} -- {todo.CreatedAt}")
+            Console.WriteLine($"{todo.Id} -- {todo.Description} -- {todo.CreatedAt}")
         Next
     End Sub
 
