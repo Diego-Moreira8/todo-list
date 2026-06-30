@@ -36,12 +36,18 @@
     End Sub
 
     Public Sub EditTodoDescription(todoId As Integer, newDescription As String)
-        Dim foundTodo As Todo = _todos.Find(Function(todo) todo.Id = todoId)
-
-        If foundTodo Is Nothing Then
-            Throw New TodoNotFoundException(todoId)
-        End If
+        Dim foundTodo As Todo = Me.GetTodo(todoId)
 
         foundTodo.Description = newDescription
     End Sub
+
+    Public Sub DeleteTodoDescription(todoId As Integer)
+        Dim foundTodo As Todo = Me.GetTodo(todoId)
+
+        _todos.Remove(foundTodo)
+    End Sub
+
+    Public Function IsEmpty()
+        Return Me._todos.Count = 0
+    End Function
 End Class

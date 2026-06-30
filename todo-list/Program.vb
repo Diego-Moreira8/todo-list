@@ -9,7 +9,7 @@ Module Program
         'todoList.AddTodo("Item 1")
         'todoList.AddTodo("Item 2")
 
-        Dim optionInput As String = ""
+        Dim optionInput As String
         Dim inputError As String = ""
 
         'Loop principal - mantém o programa rodando enquanto o usuário não escolher sair
@@ -26,7 +26,17 @@ Module Program
                 Case "1"
                     AddTodoSubmenu()
                 Case "2"
-                    EditTodoSubmenu()
+                    If todoList.IsEmpty() Then
+                        inputError = "Lista vazia, não há nada para editar!"
+                    Else
+                        EditTodoSubmenu()
+                    End If
+                Case "3"
+                    If todoList.IsEmpty() Then
+                        inputError = "Lista vazia, não há nada para apagar!"
+                    Else
+                        DeleteTodoSubmenu()
+                    End If
                 Case Else
                     inputError = "Opção inválida, tente novamente."
             End Select
@@ -56,7 +66,8 @@ Module Program
         Dim menuOptions As String() = {
             "Sair",
             "Adicionar tarefa",
-            "Editar tarefa"
+            "Editar tarefa",
+            "Apagar tarefa"
         }
 
         ReloadHeader("MENU PRINCIPAL")
@@ -86,6 +97,7 @@ Module Program
 
     Sub EditTodoSubmenu()
         Dim success As Boolean = False
+        Dim input As String
         Dim todoId As Integer
         Dim inputError As String = ""
 
@@ -99,8 +111,10 @@ Module Program
                 inputError = ""
             End If
 
-            Console.WriteLine("Digite o ID da tarefa que deseja editar e pressione enter")
-            Dim input As String = Console.ReadLine()
+            Console.WriteLine("Digite o ID da tarefa que deseja editar (ou 0 para cancelar) e pressione enter")
+            input = Console.ReadLine()
+
+            If input = "0" Then Return
 
             Try
                 'Lança uma FormatException para um valor não numérico
@@ -113,6 +127,47 @@ Module Program
                 Dim newDescriptionInput As String = Console.ReadLine()
 
                 todoList.EditTodoDescription(todoId, newDescriptionInput)
+
+                success = True
+            Catch ex As FormatException
+                inputError = "ID inválido! Precisa ser um número inteiro maior que 1."
+                success = False
+            Catch ex As TodoNotFoundException
+                inputError = $"Tarefa com ID {todoId} não existe! Tente novamente."
+                success = False
+            End Try
+        End While
+    End Sub
+
+    Sub DeleteTodoSubmenu()
+        Dim success As Boolean = False
+        Dim input As String
+        Dim todoId As Integer
+        Dim inputError As String = ""
+
+        While Not success
+            ReloadHeader("Apagar tarefa")
+
+            'Mostra erro, se houver
+            If Not String.IsNullOrWhiteSpace(inputError) Then
+                Console.WriteLine(inputError)
+                Console.WriteLine()
+                inputError = ""
+            End If
+
+            Console.WriteLine("Digite o ID da tarefa que deseja apagar (ou 0 para cancelar) e pressione enter")
+            input = Console.ReadLine()
+
+            If input = "0" Then Return
+
+            Try
+                'Lança uma FormatException para um valor não numérico
+                todoId = Convert.ToInt32(input)
+
+                'Apenas para checar se existe. Se não, irá lançar uma TodoNotFoundException
+                todoList.GetTodo(todoId)
+
+                todoList.DeleteTodoDescription(todoId)
 
                 success = True
             Catch ex As FormatException
