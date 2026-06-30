@@ -4,6 +4,11 @@ Module Program
     Sub Main(args As String())
         Dim todoList As TodoList = New TodoList()
 
+        '!!!!!!!!!!!!!TEMP
+        todoList.AddTodo("Item 0")
+        todoList.AddTodo("Item 1")
+        todoList.AddTodo("Item 2")
+
         Dim optionInput As String = ""
         Dim inputError As String = ""
 
@@ -22,6 +27,8 @@ Module Program
                     PrintTodosSubmenu(todoList)
                 Case "2"
                     AddTodoSubmenu(todoList)
+                Case "3"
+                    EditTodoSubmenu(todoList)
                 Case Else
                     inputError = "Opção inválida, tente novamente."
             End Select
@@ -37,12 +44,19 @@ Module Program
         Console.WriteLine()
     End Sub
 
+    Sub PauseConsole()
+        Console.WriteLine()
+        Console.WriteLine("Pressione qualquer tecla para voltar para o menu principal")
+        Console.ReadKey()
+    End Sub
+
     Sub RenderMainMenu(inputError As String)
         'TODO: editar e apagar item
         Dim menuOptions As String() = {
             "Sair",
-            "Ver lista",
-            "Adicionar item"
+            "Ver tarefas",
+            "Adicionar tarefa",
+            "Editar tarefa"
         }
 
         ClearConsole("MENU PRINCIPAL")
@@ -66,9 +80,7 @@ Module Program
 
         todoList.PrintTasks()
 
-        Console.WriteLine()
-        Console.WriteLine("Pressione qualquer tecla para voltar para o menu principal")
-        Console.ReadKey()
+        PauseConsole()
     End Sub
 
     Sub AddTodoSubmenu(todoList As TodoList)
@@ -78,5 +90,46 @@ Module Program
         Dim newTodoDescription As String = Console.ReadLine()
 
         todoList.AddTodo(newTodoDescription)
+    End Sub
+
+    Sub EditTodoSubmenu(todoList As TodoList)
+        Dim success As Boolean = False
+        Dim todoId As Integer
+        Dim inputError As String = ""
+
+        While Not success
+            ClearConsole("EDITAR TAREFA")
+
+            'Mostra erro, se houver
+            If Not String.IsNullOrWhiteSpace(inputError) Then
+                Console.WriteLine(inputError)
+                Console.WriteLine()
+                inputError = ""
+            End If
+
+            Console.WriteLine("Digite o ID da tarefa que deseja editar e pressione enter")
+            Dim input As String = Console.ReadLine()
+
+            Try
+                'Lança uma FormatException para um valor não numérico
+                todoId = Convert.ToInt32(input)
+
+                'Apenas para checar se existe. Se não, irá lançar uma TodoNotFoundException
+                todoList.GetTodo(todoId)
+
+                Console.WriteLine("Digite uma nova descrição para a tarefa e pressione enter")
+                Dim newDescriptionInput As String = Console.ReadLine()
+
+                todoList.EditTodoDescription(todoId, newDescriptionInput)
+
+                success = True
+            Catch ex As FormatException
+                inputError = "ID inválido! Precisa ser um número inteiro maior que 1."
+                success = False
+            Catch ex As TodoNotFoundException
+                inputError = $"Tarefa com ID {todoId} não existe! Tente novamente."
+                success = False
+            End Try
+        End While
     End Sub
 End Module
