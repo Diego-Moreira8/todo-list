@@ -5,9 +5,9 @@ Module Program
 
     Sub Main(args As String())
         'Testes
-        'todoList.AddTodo("Item 0")
-        'todoList.AddTodo("Item 1")
-        'todoList.AddTodo("Item 2")
+        todoList.AddTodo("Item 0")
+        todoList.AddTodo("Item 1")
+        todoList.AddTodo("Item 2")
 
         Dim optionInput As String
         Dim inputError As String = ""
@@ -89,10 +89,13 @@ Module Program
     Sub AddTodoSubmenu()
         ReloadHeader("ADICIONAR TAREFA")
 
-        Console.WriteLine("Digite uma descrição da tarefa e pressione enter:")
+        Console.WriteLine("Digite uma descrição da tarefa (ou deixe em branco para cancelar) e pressione enter:")
         Dim newTodoDescription As String = Console.ReadLine()
 
-        todoList.AddTodo(newTodoDescription)
+        If Not String.IsNullOrWhiteSpace(newTodoDescription) Then
+            todoList.AddTodo(newTodoDescription)
+        End If
+
     End Sub
 
     Sub EditTodoSubmenu()
@@ -111,10 +114,10 @@ Module Program
                 inputError = ""
             End If
 
-            Console.WriteLine("Digite o ID da tarefa que deseja editar (ou 0 para cancelar) e pressione enter")
+            Console.WriteLine("Digite o ID da tarefa que deseja editar (ou deixe em branco para cancelar) e pressione enter")
             input = Console.ReadLine()
 
-            If input = "0" Then Return
+            If String.IsNullOrWhiteSpace(input) Then Return
 
             Try
                 'Lança uma FormatException para um valor não numérico
@@ -123,10 +126,13 @@ Module Program
                 'Apenas para checar se existe. Se não, irá lançar uma TodoNotFoundException
                 todoList.GetTodo(todoId)
 
-                Console.WriteLine("Digite uma nova descrição para a tarefa e pressione enter")
+                Console.WriteLine("Digite uma nova descrição para a tarefa (ou deixe em branco para cancelar) e pressione enter")
                 Dim newDescriptionInput As String = Console.ReadLine()
 
-                todoList.EditTodoDescription(todoId, newDescriptionInput)
+                If Not String.IsNullOrWhiteSpace(newDescriptionInput) Then
+                    todoList.EditTodoDescription(todoId, newDescriptionInput)
+                End If
+
 
                 success = True
             Catch ex As FormatException
@@ -155,10 +161,10 @@ Module Program
                 inputError = ""
             End If
 
-            Console.WriteLine("Digite o ID da tarefa que deseja apagar (ou 0 para cancelar) e pressione enter")
+            Console.WriteLine("Digite o ID da tarefa que deseja apagar (ou deixe em branco para cancelar) e pressione enter")
             input = Console.ReadLine()
 
-            If input = "0" Then Return
+            If String.IsNullOrWhiteSpace(input) Then Return
 
             Try
                 'Lança uma FormatException para um valor não numérico
