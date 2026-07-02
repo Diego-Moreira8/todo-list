@@ -43,13 +43,13 @@ Module Program
         Loop While optionInput <> "0"
     End Sub
 
-    Sub ReloadHeader(menuTitle As String)
+    Sub ReloadHeader(menuTitle As String, Optional idOfSelectedTodo As Integer = 0)
         'Limpa o console e renderiza o cabeçalho
         'O cabaçalho mostra a lista de tarefas atual
         Console.Clear()
         Console.WriteLine("=====[ LISTA DE TAREFAS ]=====")
         Console.WriteLine()
-        todoList.PrintTasks()
+        todoList.PrintTasks(idOfSelectedTodo)
         Console.WriteLine()
         Console.WriteLine(menuTitle.ToUpper())
         Console.WriteLine()
@@ -126,6 +126,8 @@ Module Program
                 'Apenas para checar se existe. Se não, irá lançar uma TodoNotFoundException
                 todoList.GetTodo(todoId)
 
+                ReloadHeader("EDITAR TAREFA", todoId)
+
                 Console.WriteLine("Digite uma nova descrição para a tarefa (ou deixe em branco para cancelar) e pressione enter")
                 Dim newDescriptionInput As String = Console.ReadLine()
 
@@ -173,7 +175,16 @@ Module Program
                 'Apenas para checar se existe. Se não, irá lançar uma TodoNotFoundException
                 todoList.GetTodo(todoId)
 
-                todoList.DeleteTodoDescription(todoId)
+                ReloadHeader("Apagar tarefa", todoId)
+
+                Console.WriteLine($"Tem certeza que deseja apagar a tarefa #{todoId}? Essa ação não poderá ser desfeita!")
+                Console.WriteLine("[S] para sim / [N] para não)")
+
+                Dim deleteConfirmationInput As String = Console.ReadLine().ToUpper()
+
+                If deleteConfirmationInput = "S" Then
+                    todoList.DeleteTodoDescription(todoId)
+                End If
 
                 success = True
             Catch ex As FormatException

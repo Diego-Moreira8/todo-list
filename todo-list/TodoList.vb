@@ -6,7 +6,7 @@
         Me._todos = New List(Of Todo)
     End Sub
 
-    Public Sub PrintTasks()
+    Public Sub PrintTasks(Optional idOfSelectedTodo As Integer = 0)
         Console.WriteLine("ID -- Descrição -- Data/Hora da Criação")
 
         If _todos.Count = 0 Then
@@ -15,7 +15,7 @@
         End If
 
         For Each todo As Todo In _todos
-            Console.WriteLine($"{todo.Id} -- {todo.Description} -- {todo.CreatedAt}")
+            Console.WriteLine($"{If(idOfSelectedTodo = todo.Id, "*", " ")} {todo.Id} -- {todo.Description} -- {todo.CreatedAt}")
         Next
     End Sub
 
