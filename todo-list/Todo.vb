@@ -3,14 +3,14 @@
     Private Property _description As String
     Public ReadOnly Property CreatedAt As Date
 
-    Public Sub New(id As Integer, description As String)
+    Public Sub New(id As Integer, description As String, createdAt As Date)
         If String.IsNullOrWhiteSpace(description) Then
             Throw New InvalidOperationException("Todo list description cannot be empty")
         End If
 
         Me.Id = id
         Me._description = description
-        Me._CreatedAt = Date.Now
+        Me.CreatedAt = createdAt
     End Sub
 
     Property Description As String
@@ -22,6 +22,7 @@
             If String.IsNullOrWhiteSpace(value) Then
                 Throw New InvalidOperationException("Todo list description cannot be empty")
             End If
+
             _description = value
         End Set
     End Property

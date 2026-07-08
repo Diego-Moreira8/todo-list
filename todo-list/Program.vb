@@ -1,13 +1,37 @@
-Imports System
+Imports System.Data
+Imports Microsoft.Data.SqlClient
 
 Module Program
-    Dim todoList As TodoList = New TodoList()
+    Dim todoList = New TodoList()
+    Dim todosDataSet As New DataSet()
+    Dim adapter As SqlDataAdapter
 
     Sub Main(args As String())
-        'Testes
-        todoList.AddTodo("Item 0")
-        todoList.AddTodo("Item 1")
-        todoList.AddTodo("Item 2")
+        Dim connectionString As String = "Server=(localdb)\MSSQLLocalDB;Database=TodoListDB;Integrated Security=True"
+
+        'Abre conexão para trazer os dados para a memória
+        Using connection As New SqlConnection(connectionString)
+            Try
+                connection.Open()
+                adapter = New SqlDataAdapter("SELECT * FROM Todos", connection)
+                adapter.Fill(todosDataSet, "Todos")
+            Catch ex As Exception
+                Console.WriteLine("Conexão com o banco de dados falhou!")
+                Console.WriteLine(ex.Message)
+                Console.WriteLine("Pressione qualquer tecla para sair.")
+                Console.ReadKey()
+                Return
+            End Try
+        End Using
+
+        For Each row As DataRow In todosDataSet.Tables("Todos").Rows
+            Dim id As Integer = row("Id")
+            Dim description As String = row("DescriptionText")
+            Dim createdAt As DateTime = row("CreatedAt")
+
+            todoList.AddTodo(New Todo(id, description, createdAt))
+        Next
+
 
         Dim optionInput As String
         Dim inputError As String = ""
@@ -93,7 +117,7 @@ Module Program
         Dim newTodoDescription As String = Console.ReadLine()
 
         If Not String.IsNullOrWhiteSpace(newTodoDescription) Then
-            todoList.AddTodo(newTodoDescription)
+            todoList.AddTodo(New Todo(1, newTodoDescription, Now))
         End If
 
     End Sub
@@ -124,7 +148,7 @@ Module Program
                 todoId = Convert.ToInt32(input)
 
                 'Apenas para checar se existe. Se não, irá lançar uma TodoNotFoundException
-                todoList.GetTodo(todoId)
+                todoList.GetTodoById(todoId)
 
                 ReloadHeader("EDITAR TAREFA", todoId)
 
@@ -173,7 +197,7 @@ Module Program
                 todoId = Convert.ToInt32(input)
 
                 'Apenas para checar se existe. Se não, irá lançar uma TodoNotFoundException
-                todoList.GetTodo(todoId)
+                todoList.GetTodoById(todoId)
 
                 ReloadHeader("Apagar tarefa", todoId)
 
@@ -183,7 +207,7 @@ Module Program
                 Dim deleteConfirmationInput As String = Console.ReadLine().ToUpper()
 
                 If deleteConfirmationInput = "S" Then
-                    todoList.DeleteTodoDescription(todoId)
+                    todoList.DeleteTodo(todoId)
                 End If
 
                 success = True
