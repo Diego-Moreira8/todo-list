@@ -3,77 +3,11 @@ Imports Microsoft.Data.SqlClient
 
 Module Program
 
-    ReadOnly connectionString As String = "Server=(localdb)\MSSQLLocalDB;Database=TodoListDB;Integrated Security=True"
-
-    Dim todoList = New TodoList()
-    Dim todosDataSet As New DataSet()
-    Dim adapter As SqlDataAdapter
-    Dim nextTodoId As Integer = 1
+    Dim todoList As TodoList = New TodoList()
 
     Sub Main(args As String())
 
-        ImportData()
         AppMainLoop()
-
-    End Sub
-
-    Sub ImportData()
-
-        'Abre conexão para trazer os dados para a memória
-        Using connection As New SqlConnection(connectionString)
-            Try
-                Console.WriteLine("Importando dados da base de dados...")
-
-                connection.Open()
-                adapter = New SqlDataAdapter("SELECT * FROM Todos", connection)
-
-                'Cria uma DataTable de nome "Todos" dentro do DataSet todosDataSet
-                adapter.Fill(todosDataSet, "Todos")
-            Catch ex As Exception
-                Console.WriteLine("Conexão com a base de dados falhou!")
-                Console.WriteLine(ex.Message)
-                Console.WriteLine("Pressione qualquer tecla para sair.")
-                Console.ReadKey()
-                Return
-            End Try
-        End Using
-
-
-        'Cria objetos Todo a partir do dataset e define o NextTodoId
-        For Each row As DataRow In todosDataSet.Tables("Todos").Rows
-            Dim id As Integer = row("Id")
-            Dim description As String = row("DescriptionText")
-            Dim createdAt As DateTime = row("CreatedAt")
-
-            todoList.AddTodo(New Todo(id, description, createdAt))
-
-            If id >= NextTodoId Then NextTodoId = id + 1
-        Next
-
-    End Sub
-
-    Sub SyncDataBase()
-
-        'SqlCommandBuilder irá gerar as queries para sincronizar os dados
-        Dim builder As New SqlCommandBuilder(adapter)
-
-        Using connection As New SqlConnection(connectionString)
-            Try
-                Console.WriteLine("Sincronizando com a base de dados...")
-                connection.Open()
-                adapter.SelectCommand.Connection = connection
-                adapter.Update(todosDataSet, "Todos")
-
-                Console.WriteLine("Dados sincronizados com sucesso!")
-                Console.WriteLine("Pressione qualquer tecla para sair.")
-                Console.ReadKey()
-            Catch ex As Exception
-                Console.WriteLine("Conexão com a base de dados falhou!")
-                Console.WriteLine(ex.Message)
-                Console.WriteLine("Pressione qualquer tecla para sair.")
-                Console.ReadKey()
-            End Try
-        End Using
 
     End Sub
 
@@ -93,21 +27,21 @@ Module Program
             Select Case optionInput
                 Case "0"
                     ReloadHeader("Saindo...")
-                    SyncDataBase()
-                Case "1"
-                    AddTodoSubmenu()
-                Case "2"
-                    If todoList.IsEmpty() Then
-                        inputError = "Lista vazia, não há nada para editar!"
-                    Else
-                        EditTodoSubmenu()
-                    End If
-                Case "3"
-                    If todoList.IsEmpty() Then
-                        inputError = "Lista vazia, não há nada para apagar!"
-                    Else
-                        DeleteTodoSubmenu()
-                    End If
+                    todoList.SyncDataBase()
+                    'Case "1"
+                    '    AddTodoSubmenu()
+                    'Case "2"
+                    '    If todoList.IsEmpty() Then
+                    '        inputError = "Lista vazia, não há nada para editar!"
+                    '    Else
+                    '        EditTodoSubmenu()
+                    '    End If
+                    'Case "3"
+                    '    If todoList.IsEmpty() Then
+                    '        inputError = "Lista vazia, não há nada para apagar!"
+                    '    Else
+                    '        DeleteTodoSubmenu()
+                    '    End If
                 Case Else
                     inputError = "Opção inválida, tente novamente."
             End Select
@@ -166,130 +100,120 @@ Module Program
 
     End Sub
 
-    Sub AddTodoSubmenu()
+    'Sub AddTodoSubmenu()
 
-        ReloadHeader("ADICIONAR TAREFA")
+    '    ReloadHeader("ADICIONAR TAREFA")
 
-        Console.WriteLine("Digite uma descrição da tarefa (ou deixe em branco para cancelar) e pressione enter:")
-        Dim newTodoDescription As String = Console.ReadLine()
+    '    Console.WriteLine("Digite uma descrição da tarefa (ou deixe em branco para cancelar) e pressione enter:")
+    '    Dim newTodoDescription As String = Console.ReadLine()
 
-        If Not String.IsNullOrWhiteSpace(newTodoDescription) Then
-            Dim newTodo = New Todo(nextTodoId, newTodoDescription, Now)
+    '    If Not String.IsNullOrWhiteSpace(newTodoDescription) Then
+    '        todoList.AddTodo(newTodoDescription)
+    '    End If
 
-            todoList.AddTodo(newTodo)
+    'End Sub
 
-            'Adiciona no DataSet
-            Dim newTodoRow As DataRow = todosDataSet.Tables("Todos").NewRow()
+    'Sub EditTodoSubmenu()
 
-            newTodoRow("DescriptionText") = newTodo.Description
-            newTodoRow("CreatedAt") = newTodo.CreatedAt
+    '    Dim success As Boolean = False
+    '    Dim input As String
+    '    Dim todoId As Integer
+    '    Dim inputError As String = ""
 
-            todosDataSet.Tables("Todos").Rows.Add(newTodoRow)
-        End If
+    '    While Not success
+    '        ReloadHeader("EDITAR TAREFA")
 
-    End Sub
+    '        'Mostra erro, se houver
+    '        If Not String.IsNullOrWhiteSpace(inputError) Then
+    '            Console.WriteLine(inputError)
+    '            Console.WriteLine()
+    '            inputError = ""
+    '        End If
 
-    Sub EditTodoSubmenu()
+    '        Console.WriteLine("Digite o ID da tarefa que deseja editar (ou deixe em branco para cancelar) e pressione enter")
+    '        input = Console.ReadLine()
 
-        Dim success As Boolean = False
-        Dim input As String
-        Dim todoId As Integer
-        Dim inputError As String = ""
+    '        If String.IsNullOrWhiteSpace(input) Then Return
 
-        While Not success
-            ReloadHeader("EDITAR TAREFA")
+    '        Try
+    '            'Lança uma FormatException para um valor não numérico
+    '            todoId = Convert.ToInt32(input)
 
-            'Mostra erro, se houver
-            If Not String.IsNullOrWhiteSpace(inputError) Then
-                Console.WriteLine(inputError)
-                Console.WriteLine()
-                inputError = ""
-            End If
+    '            'Apenas para checar se existe. Se não, irá lançar uma TodoNotFoundException
+    '            todoList.GetTodoById(todoId)
 
-            Console.WriteLine("Digite o ID da tarefa que deseja editar (ou deixe em branco para cancelar) e pressione enter")
-            input = Console.ReadLine()
+    '            ReloadHeader("EDITAR TAREFA", todoId)
 
-            If String.IsNullOrWhiteSpace(input) Then Return
+    '            Console.WriteLine("Digite uma nova descrição para a tarefa (ou deixe em branco para cancelar) e pressione enter")
+    '            Dim newDescriptionInput As String = Console.ReadLine()
 
-            Try
-                'Lança uma FormatException para um valor não numérico
-                todoId = Convert.ToInt32(input)
-
-                'Apenas para checar se existe. Se não, irá lançar uma TodoNotFoundException
-                todoList.GetTodoById(todoId)
-
-                ReloadHeader("EDITAR TAREFA", todoId)
-
-                Console.WriteLine("Digite uma nova descrição para a tarefa (ou deixe em branco para cancelar) e pressione enter")
-                Dim newDescriptionInput As String = Console.ReadLine()
-
-                If Not String.IsNullOrWhiteSpace(newDescriptionInput) Then
-                    todoList.EditTodoDescription(todoId, newDescriptionInput)
-                End If
+    '            If Not String.IsNullOrWhiteSpace(newDescriptionInput) Then
+    '                todoList.EditTodoDescription(todoId, newDescriptionInput)
+    '            End If
 
 
-                success = True
-            Catch ex As FormatException
-                inputError = "ID inválido! Precisa ser um número inteiro maior que 1."
-                success = False
-            Catch ex As TodoNotFoundException
-                inputError = $"Tarefa com ID {todoId} não existe! Tente novamente."
-                success = False
-            End Try
-        End While
+    '            success = True
+    '        Catch ex As FormatException
+    '            inputError = "ID inválido! Precisa ser um número inteiro maior que 1."
+    '            success = False
+    '        Catch ex As TodoNotFoundException
+    '            inputError = $"Tarefa com ID {todoId} não existe! Tente novamente."
+    '            success = False
+    '        End Try
+    '    End While
 
-    End Sub
+    'End Sub
 
-    Sub DeleteTodoSubmenu()
+    'Sub DeleteTodoSubmenu()
 
-        Dim success As Boolean = False
-        Dim input As String
-        Dim todoId As Integer
-        Dim inputError As String = ""
+    '    Dim success As Boolean = False
+    '    Dim input As String
+    '    Dim todoId As Integer
+    '    Dim inputError As String = ""
 
-        While Not success
-            ReloadHeader("Apagar tarefa")
+    '    While Not success
+    '        ReloadHeader("Apagar tarefa")
 
-            'Mostra erro, se houver
-            If Not String.IsNullOrWhiteSpace(inputError) Then
-                Console.WriteLine(inputError)
-                Console.WriteLine()
-                inputError = ""
-            End If
+    '        'Mostra erro, se houver
+    '        If Not String.IsNullOrWhiteSpace(inputError) Then
+    '            Console.WriteLine(inputError)
+    '            Console.WriteLine()
+    '            inputError = ""
+    '        End If
 
-            Console.WriteLine("Digite o ID da tarefa que deseja apagar (ou deixe em branco para cancelar) e pressione enter")
-            input = Console.ReadLine()
+    '        Console.WriteLine("Digite o ID da tarefa que deseja apagar (ou deixe em branco para cancelar) e pressione enter")
+    '        input = Console.ReadLine()
 
-            If String.IsNullOrWhiteSpace(input) Then Return
+    '        If String.IsNullOrWhiteSpace(input) Then Return
 
-            Try
-                'Lança uma FormatException para um valor não numérico
-                todoId = Convert.ToInt32(input)
+    '        Try
+    '            'Lança uma FormatException para um valor não numérico
+    '            todoId = Convert.ToInt32(input)
 
-                'Apenas para checar se existe. Se não, irá lançar uma TodoNotFoundException
-                todoList.GetTodoById(todoId)
+    '            'Apenas para checar se existe. Se não, irá lançar uma TodoNotFoundException
+    '            todoList.GetTodoById(todoId)
 
-                ReloadHeader("Apagar tarefa", todoId)
+    '            ReloadHeader("Apagar tarefa", todoId)
 
-                Console.WriteLine($"Tem certeza que deseja apagar a tarefa #{todoId}? Essa ação não poderá ser desfeita!")
-                Console.WriteLine("[S] para sim / [N] para não)")
+    '            Console.WriteLine($"Tem certeza que deseja apagar a tarefa #{todoId}? Essa ação não poderá ser desfeita!")
+    '            Console.WriteLine("[S] para sim / [N] para não)")
 
-                Dim deleteConfirmationInput As String = Console.ReadLine().ToUpper()
+    '            Dim deleteConfirmationInput As String = Console.ReadLine().ToUpper()
 
-                If deleteConfirmationInput = "S" Then
-                    todoList.DeleteTodo(todoId)
-                End If
+    '            If deleteConfirmationInput = "S" Then
+    '                todoList.DeleteTodo(todoId)
+    '            End If
 
-                success = True
-            Catch ex As FormatException
-                inputError = "ID inválido! Precisa ser um número inteiro maior que 1."
-                success = False
-            Catch ex As TodoNotFoundException
-                inputError = $"Tarefa com ID {todoId} não existe! Tente novamente."
-                success = False
-            End Try
-        End While
+    '            success = True
+    '        Catch ex As FormatException
+    '            inputError = "ID inválido! Precisa ser um número inteiro maior que 1."
+    '            success = False
+    '        Catch ex As TodoNotFoundException
+    '            inputError = $"Tarefa com ID {todoId} não existe! Tente novamente."
+    '            success = False
+    '        End Try
+    '    End While
 
-    End Sub
+    'End Sub
 
 End Module
