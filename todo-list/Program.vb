@@ -3,9 +3,12 @@ Imports Microsoft.Data.SqlClient
 
 Module Program
 
+    ReadOnly connectionString As String = "Server=(localdb)\MSSQLLocalDB;Database=TodoListDB;Integrated Security=True"
+
     Dim todoList = New TodoList()
     Dim todosDataSet As New DataSet()
     Dim adapter As SqlDataAdapter
+    Dim nextTodoId As Integer = 1
 
     Sub Main(args As String())
 
@@ -15,17 +18,19 @@ Module Program
     End Sub
 
     Sub ImportData()
-        'Criar uma base de dados em MSSQLLocalDB com o nome TodoListDB
-        Dim connectionString As String = "Server=(localdb)\MSSQLLocalDB;Database=TodoListDB;Integrated Security=True"
 
         'Abre conexão para trazer os dados para a memória
         Using connection As New SqlConnection(connectionString)
             Try
+                Console.WriteLine("Importando dados da base de dados...")
+
                 connection.Open()
                 adapter = New SqlDataAdapter("SELECT * FROM Todos", connection)
+
+                'Cria uma DataTable de nome "Todos" dentro do DataSet todosDataSet
                 adapter.Fill(todosDataSet, "Todos")
             Catch ex As Exception
-                Console.WriteLine("Conexão com o banco de dados falhou!")
+                Console.WriteLine("Conexão com a base de dados falhou!")
                 Console.WriteLine(ex.Message)
                 Console.WriteLine("Pressione qualquer tecla para sair.")
                 Console.ReadKey()
@@ -33,14 +38,43 @@ Module Program
             End Try
         End Using
 
-        'Cria objetos Todo a partir do dataset
+
+        'Cria objetos Todo a partir do dataset e define o NextTodoId
         For Each row As DataRow In todosDataSet.Tables("Todos").Rows
             Dim id As Integer = row("Id")
             Dim description As String = row("DescriptionText")
             Dim createdAt As DateTime = row("CreatedAt")
 
             todoList.AddTodo(New Todo(id, description, createdAt))
+
+            If id >= NextTodoId Then NextTodoId = id + 1
         Next
+
+    End Sub
+
+    Sub SyncDataBase()
+
+        'SqlCommandBuilder irá gerar as queries para sincronizar os dados
+        Dim builder As New SqlCommandBuilder(adapter)
+
+        Using connection As New SqlConnection(connectionString)
+            Try
+                Console.WriteLine("Sincronizando com a base de dados...")
+                connection.Open()
+                adapter.SelectCommand.Connection = connection
+                adapter.Update(todosDataSet, "Todos")
+
+                Console.WriteLine("Dados sincronizados com sucesso!")
+                Console.WriteLine("Pressione qualquer tecla para sair.")
+                Console.ReadKey()
+            Catch ex As Exception
+                Console.WriteLine("Conexão com a base de dados falhou!")
+                Console.WriteLine(ex.Message)
+                Console.WriteLine("Pressione qualquer tecla para sair.")
+                Console.ReadKey()
+            End Try
+        End Using
+
     End Sub
 
     Sub AppMainLoop()
@@ -59,6 +93,7 @@ Module Program
             Select Case optionInput
                 Case "0"
                     ReloadHeader("Saindo...")
+                    SyncDataBase()
                 Case "1"
                     AddTodoSubmenu()
                 Case "2"
@@ -108,7 +143,7 @@ Module Program
 
         'TODO: editar e apagar item
         Dim menuOptions As String() = {
-            "Sair",
+            "Sair (e salvar alterações na base de dados)",
             "Adicionar tarefa",
             "Editar tarefa",
             "Apagar tarefa"
@@ -139,7 +174,17 @@ Module Program
         Dim newTodoDescription As String = Console.ReadLine()
 
         If Not String.IsNullOrWhiteSpace(newTodoDescription) Then
-            todoList.AddTodo(New Todo(1, newTodoDescription, Now))
+            Dim newTodo = New Todo(nextTodoId, newTodoDescription, Now)
+
+            todoList.AddTodo(newTodo)
+
+            'Adiciona no DataSet
+            Dim newTodoRow As DataRow = todosDataSet.Tables("Todos").NewRow()
+
+            newTodoRow("DescriptionText") = newTodo.Description
+            newTodoRow("CreatedAt") = newTodo.CreatedAt
+
+            todosDataSet.Tables("Todos").Rows.Add(newTodoRow)
         End If
 
     End Sub

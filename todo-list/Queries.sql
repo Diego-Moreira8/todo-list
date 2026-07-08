@@ -7,3 +7,5 @@
 SELECT * FROM Todos
 
 INSERT INTO Todos (DescriptionText) VALUES ('Tarefa inserida via query')
+
+

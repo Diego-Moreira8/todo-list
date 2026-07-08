@@ -1,7 +1,6 @@
 ﻿Public Class TodoList
 
     Public Property Todos As List(Of Todo)
-    'Private Property NextTodoId As Integer = 1
 
     Public Sub New()
 
