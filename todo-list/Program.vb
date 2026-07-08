@@ -28,8 +28,8 @@ Module Program
                 Case "0"
                     ReloadHeader("Saindo...")
                     todoList.SyncDataBase()
-                    'Case "1"
-                    '    AddTodoSubmenu()
+                Case "1"
+                    AddTodoSubmenu()
                     'Case "2"
                     '    If todoList.IsEmpty() Then
                     '        inputError = "Lista vazia, não há nada para editar!"
@@ -100,18 +100,18 @@ Module Program
 
     End Sub
 
-    'Sub AddTodoSubmenu()
+    Sub AddTodoSubmenu()
 
-    '    ReloadHeader("ADICIONAR TAREFA")
+        ReloadHeader("ADICIONAR TAREFA")
 
-    '    Console.WriteLine("Digite uma descrição da tarefa (ou deixe em branco para cancelar) e pressione enter:")
-    '    Dim newTodoDescription As String = Console.ReadLine()
+        Console.WriteLine("Digite uma descrição da tarefa (ou deixe em branco para cancelar) e pressione enter:")
+        Dim newTodoDescription As String = Console.ReadLine()
 
-    '    If Not String.IsNullOrWhiteSpace(newTodoDescription) Then
-    '        todoList.AddTodo(newTodoDescription)
-    '    End If
+        If Not String.IsNullOrWhiteSpace(newTodoDescription) Then
+            todoList.AddTodo(newTodoDescription)
+        End If
 
-    'End Sub
+    End Sub
 
     'Sub EditTodoSubmenu()
 

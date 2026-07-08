@@ -108,6 +108,7 @@ Public Class TodoList
 
         Dim newTodoDataRow As DataRow = Me.TodosDataSet.Tables("Todos").NewRow()
 
+        newTodoDataRow("Id") = NextTodoId
         newTodoDataRow("DescriptionText") = descriptionText
         newTodoDataRow("CreatedAt") = Now
 
