@@ -92,17 +92,17 @@ Public Class TodoList
 
     End Sub
 
-    'Public Function GetTodoById(todoId As Integer)
+    Public Function FindTodoByIdOrThrow(todoId As Integer) As DataRow
 
-    '    Dim foundTodo As Todo = TodosList.Find(Function(todo) todoId = todo.Id)
+        Dim rows() As DataRow = TodosDataSet.Tables("Todos").Select($"id = {todoId}", "Id DESC")
 
-    '    If foundTodo Is Nothing Then
-    '        Throw New TodoNotFoundException(todoId)
-    '    End If
+        If rows.Length = 0 Then
+            Throw New TodoNotFoundException(todoId)
+        End If
 
-    '    Return foundTodo
+        Return rows(0)
 
-    'End Function
+    End Function
 
     Public Sub AddTodo(descriptionText As String)
 
@@ -118,13 +118,13 @@ Public Class TodoList
 
     End Sub
 
-    'Public Sub EditTodoDescription(todoId As Integer, newDescription As String)
+    Public Sub EditTodoDescription(todoId As Integer, newDescription As String)
 
-    '    Dim foundTodo As Todo = Me.GetTodoById(todoId)
+        Dim foundTodo As DataRow = Me.FindTodoByIdOrThrow(todoId)
 
-    '    foundTodo.Description = newDescription
+        foundTodo("DescriptionText") = newDescription
 
-    'End Sub
+    End Sub
 
     'Public Sub DeleteTodo(todoId As Integer)
 
@@ -134,10 +134,10 @@ Public Class TodoList
 
     'End Sub
 
-    'Public Function IsEmpty()
+    Public Function IsEmpty() As Boolean
 
-    '    Return Me.TodosList.Count = 0
+        Return Me.TodosDataSet.Tables("Todos").Rows.Count = 0
 
-    'End Function
+    End Function
 
 End Class

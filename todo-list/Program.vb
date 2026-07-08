@@ -30,12 +30,12 @@ Module Program
                     todoList.SyncDataBase()
                 Case "1"
                     AddTodoSubmenu()
-                    'Case "2"
-                    '    If todoList.IsEmpty() Then
-                    '        inputError = "Lista vazia, não há nada para editar!"
-                    '    Else
-                    '        EditTodoSubmenu()
-                    '    End If
+                Case "2"
+                    If todoList.IsEmpty() Then
+                        inputError = "Lista vazia, não há nada para editar!"
+                    Else
+                        EditTodoSubmenu()
+                    End If
                     'Case "3"
                     '    If todoList.IsEmpty() Then
                     '        inputError = "Lista vazia, não há nada para apagar!"
@@ -113,56 +113,57 @@ Module Program
 
     End Sub
 
-    'Sub EditTodoSubmenu()
+    Sub EditTodoSubmenu()
 
-    '    Dim success As Boolean = False
-    '    Dim input As String
-    '    Dim todoId As Integer
-    '    Dim inputError As String = ""
+        Dim success As Boolean = False
+        Dim input As String
+        Dim todoId As Integer
+        Dim inputError As String = ""
 
-    '    While Not success
-    '        ReloadHeader("EDITAR TAREFA")
+        While Not success
+            ReloadHeader("EDITAR TAREFA")
 
-    '        'Mostra erro, se houver
-    '        If Not String.IsNullOrWhiteSpace(inputError) Then
-    '            Console.WriteLine(inputError)
-    '            Console.WriteLine()
-    '            inputError = ""
-    '        End If
+            'Mostra erro, se houver
+            If Not String.IsNullOrWhiteSpace(inputError) Then
+                Console.WriteLine(inputError)
+                Console.WriteLine()
+                inputError = ""
+            End If
 
-    '        Console.WriteLine("Digite o ID da tarefa que deseja editar (ou deixe em branco para cancelar) e pressione enter")
-    '        input = Console.ReadLine()
+            Console.WriteLine("Digite o ID da tarefa que deseja editar (ou deixe em branco para cancelar) e pressione enter")
+            input = Console.ReadLine()
 
-    '        If String.IsNullOrWhiteSpace(input) Then Return
+            If String.IsNullOrWhiteSpace(input) Then Return
 
-    '        Try
-    '            'Lança uma FormatException para um valor não numérico
-    '            todoId = Convert.ToInt32(input)
+            Try
+                'Lança uma FormatException para um valor não numérico
+                todoId = Convert.ToInt32(input)
 
-    '            'Apenas para checar se existe. Se não, irá lançar uma TodoNotFoundException
-    '            todoList.GetTodoById(todoId)
+                'Apenas para checar se existe antes de solicitar a nova descrição.
+                'Se não existir, irá lançar uma TodoNotFoundException
+                todoList.FindTodoByIdOrThrow(todoId)
 
-    '            ReloadHeader("EDITAR TAREFA", todoId)
+                ReloadHeader("EDITAR TAREFA", todoId)
 
-    '            Console.WriteLine("Digite uma nova descrição para a tarefa (ou deixe em branco para cancelar) e pressione enter")
-    '            Dim newDescriptionInput As String = Console.ReadLine()
+                Console.WriteLine("Digite uma nova descrição para a tarefa (ou deixe em branco para cancelar) e pressione enter")
+                Dim newDescriptionInput As String = Console.ReadLine()
 
-    '            If Not String.IsNullOrWhiteSpace(newDescriptionInput) Then
-    '                todoList.EditTodoDescription(todoId, newDescriptionInput)
-    '            End If
+                If Not String.IsNullOrWhiteSpace(newDescriptionInput) Then
+                    todoList.EditTodoDescription(todoId, newDescriptionInput)
+                End If
 
 
-    '            success = True
-    '        Catch ex As FormatException
-    '            inputError = "ID inválido! Precisa ser um número inteiro maior que 1."
-    '            success = False
-    '        Catch ex As TodoNotFoundException
-    '            inputError = $"Tarefa com ID {todoId} não existe! Tente novamente."
-    '            success = False
-    '        End Try
-    '    End While
+                success = True
+            Catch ex As FormatException
+                inputError = "ID inválido! Precisa ser um número inteiro maior que 1."
+                success = False
+            Catch ex As TodoNotFoundException
+                inputError = $"Tarefa com ID {todoId} não existe! Tente novamente."
+                success = False
+            End Try
+        End While
 
-    'End Sub
+    End Sub
 
     'Sub DeleteTodoSubmenu()
 
