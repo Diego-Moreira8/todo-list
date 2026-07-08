@@ -2,11 +2,20 @@ Imports System.Data
 Imports Microsoft.Data.SqlClient
 
 Module Program
+
     Dim todoList = New TodoList()
     Dim todosDataSet As New DataSet()
     Dim adapter As SqlDataAdapter
 
     Sub Main(args As String())
+
+        ImportData()
+        AppMainLoop()
+
+    End Sub
+
+    Sub ImportData()
+        'Criar uma base de dados em MSSQLLocalDB com o nome TodoListDB
         Dim connectionString As String = "Server=(localdb)\MSSQLLocalDB;Database=TodoListDB;Integrated Security=True"
 
         'Abre conexão para trazer os dados para a memória
@@ -24,6 +33,7 @@ Module Program
             End Try
         End Using
 
+        'Cria objetos Todo a partir do dataset
         For Each row As DataRow In todosDataSet.Tables("Todos").Rows
             Dim id As Integer = row("Id")
             Dim description As String = row("DescriptionText")
@@ -31,12 +41,14 @@ Module Program
 
             todoList.AddTodo(New Todo(id, description, createdAt))
         Next
+    End Sub
 
+    Sub AppMainLoop()
+        'Mantém o programa rodando enquanto o usuário não escolher sair
 
         Dim optionInput As String
         Dim inputError As String = ""
 
-        'Loop principal - mantém o programa rodando enquanto o usuário não escolher sair
         Do
             RenderMainMenu(inputError)
 
@@ -65,27 +77,35 @@ Module Program
                     inputError = "Opção inválida, tente novamente."
             End Select
         Loop While optionInput <> "0"
+
     End Sub
 
     Sub ReloadHeader(menuTitle As String, Optional idOfSelectedTodo As Integer = 0)
+
         'Limpa o console e renderiza o cabeçalho
         'O cabaçalho mostra a lista de tarefas atual
+
         Console.Clear()
+
         Console.WriteLine("=====[ LISTA DE TAREFAS ]=====")
         Console.WriteLine()
         todoList.PrintTasks(idOfSelectedTodo)
         Console.WriteLine()
         Console.WriteLine(menuTitle.ToUpper())
         Console.WriteLine()
+
     End Sub
 
     Sub PauseConsole()
+
         Console.WriteLine()
         Console.WriteLine("Pressione qualquer tecla para voltar para o menu principal")
         Console.ReadKey()
+
     End Sub
 
     Sub RenderMainMenu(inputError As String)
+
         'TODO: editar e apagar item
         Dim menuOptions As String() = {
             "Sair",
@@ -108,9 +128,11 @@ Module Program
         For i As Integer = 0 To menuOptions.Length - 1
             Console.WriteLine($"[{i}] {menuOptions(i)}")
         Next
+
     End Sub
 
     Sub AddTodoSubmenu()
+
         ReloadHeader("ADICIONAR TAREFA")
 
         Console.WriteLine("Digite uma descrição da tarefa (ou deixe em branco para cancelar) e pressione enter:")
@@ -123,6 +145,7 @@ Module Program
     End Sub
 
     Sub EditTodoSubmenu()
+
         Dim success As Boolean = False
         Dim input As String
         Dim todoId As Integer
@@ -169,9 +192,11 @@ Module Program
                 success = False
             End Try
         End While
+
     End Sub
 
     Sub DeleteTodoSubmenu()
+
         Dim success As Boolean = False
         Dim input As String
         Dim todoId As Integer
@@ -219,5 +244,7 @@ Module Program
                 success = False
             End Try
         End While
+
     End Sub
+
 End Module
