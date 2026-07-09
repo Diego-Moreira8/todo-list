@@ -77,12 +77,18 @@ Public Class TodoList
 
         Console.WriteLine("ID -- Descrição -- Data/Hora da Criação")
 
-        If TodosDataSet.Tables("Todos").Rows.Count = 0 Then
+        If Me.IsEmpty() Then
             Console.WriteLine("Lista vazia")
             Return
         End If
 
         For Each row As DataRow In TodosDataSet.Tables("Todos").Rows
+
+            'Pula linhas deletadas
+            If row.RowState = DataRowState.Deleted Then
+                Continue For
+            End If
+
             Dim id As Integer = row("Id")
             Dim description As String = row("DescriptionText")
             Dim createdAt As Date = row("CreatedAt")
@@ -126,17 +132,23 @@ Public Class TodoList
 
     End Sub
 
-    'Public Sub DeleteTodo(todoId As Integer)
+    Public Sub DeleteTodo(todoId As Integer)
 
-    '    Dim foundTodo As Todo = Me.GetTodoById(todoId)
+        Dim foundTodo As DataRow = Me.FindTodoByIdOrThrow(todoId)
 
-    '    TodosList.Remove(foundTodo)
+        foundTodo.Delete()
 
-    'End Sub
+    End Sub
 
     Public Function IsEmpty() As Boolean
 
-        Return Me.TodosDataSet.Tables("Todos").Rows.Count = 0
+        For Each row As DataRow In TodosDataSet.Tables("Todos").Rows
+            If row.RowState <> DataRowState.Deleted Then
+                Return False
+            End If
+        Next
+
+        Return True
 
     End Function
 

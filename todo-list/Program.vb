@@ -3,7 +3,7 @@ Imports Microsoft.Data.SqlClient
 
 Module Program
 
-    Dim todoList As TodoList = New TodoList()
+    ReadOnly todoList = New TodoList()
 
     Sub Main(args As String())
 
@@ -36,12 +36,12 @@ Module Program
                     Else
                         EditTodoSubmenu()
                     End If
-                    'Case "3"
-                    '    If todoList.IsEmpty() Then
-                    '        inputError = "Lista vazia, não há nada para apagar!"
-                    '    Else
-                    '        DeleteTodoSubmenu()
-                    '    End If
+                Case "3"
+                    If todoList.IsEmpty() Then
+                        inputError = "Lista vazia, não há nada para apagar!"
+                    Else
+                        DeleteTodoSubmenu()
+                    End If
                 Case Else
                     inputError = "Opção inválida, tente novamente."
             End Select
@@ -62,14 +62,6 @@ Module Program
         Console.WriteLine()
         Console.WriteLine(menuTitle.ToUpper())
         Console.WriteLine()
-
-    End Sub
-
-    Sub PauseConsole()
-
-        Console.WriteLine()
-        Console.WriteLine("Pressione qualquer tecla para voltar para o menu principal")
-        Console.ReadKey()
 
     End Sub
 
@@ -165,56 +157,57 @@ Module Program
 
     End Sub
 
-    'Sub DeleteTodoSubmenu()
+    Sub DeleteTodoSubmenu()
 
-    '    Dim success As Boolean = False
-    '    Dim input As String
-    '    Dim todoId As Integer
-    '    Dim inputError As String = ""
+        Dim success As Boolean = False
+        Dim input As String
+        Dim todoId As Integer
+        Dim inputError As String = ""
 
-    '    While Not success
-    '        ReloadHeader("Apagar tarefa")
+        While Not success
+            ReloadHeader("Apagar tarefa")
 
-    '        'Mostra erro, se houver
-    '        If Not String.IsNullOrWhiteSpace(inputError) Then
-    '            Console.WriteLine(inputError)
-    '            Console.WriteLine()
-    '            inputError = ""
-    '        End If
+            'Mostra erro, se houver
+            If Not String.IsNullOrWhiteSpace(inputError) Then
+                Console.WriteLine(inputError)
+                Console.WriteLine()
+                inputError = ""
+            End If
 
-    '        Console.WriteLine("Digite o ID da tarefa que deseja apagar (ou deixe em branco para cancelar) e pressione enter")
-    '        input = Console.ReadLine()
+            Console.WriteLine("Digite o ID da tarefa que deseja apagar (ou deixe em branco para cancelar) e pressione enter")
+            input = Console.ReadLine()
 
-    '        If String.IsNullOrWhiteSpace(input) Then Return
+            If String.IsNullOrWhiteSpace(input) Then Return
 
-    '        Try
-    '            'Lança uma FormatException para um valor não numérico
-    '            todoId = Convert.ToInt32(input)
+            Try
+                'Lança uma FormatException para um valor não numérico
+                todoId = Convert.ToInt32(input)
 
-    '            'Apenas para checar se existe. Se não, irá lançar uma TodoNotFoundException
-    '            todoList.GetTodoById(todoId)
+                'Apenas para checar se existe antes de solicitar a nova descrição.
+                'Se não existir, irá lançar uma TodoNotFoundException
+                todoList.FindTodoByIdOrThrow(todoId)
 
-    '            ReloadHeader("Apagar tarefa", todoId)
+                ReloadHeader("Apagar tarefa", todoId)
 
-    '            Console.WriteLine($"Tem certeza que deseja apagar a tarefa #{todoId}? Essa ação não poderá ser desfeita!")
-    '            Console.WriteLine("[S] para sim / [N] para não)")
+                Console.WriteLine($"Tem certeza que deseja apagar a tarefa #{todoId}? Essa ação não poderá ser desfeita!")
+                Console.WriteLine("([S] para sim / [N] para não)")
 
-    '            Dim deleteConfirmationInput As String = Console.ReadLine().ToUpper()
+                Dim deleteConfirmationInput As String = Console.ReadLine().ToUpper()
 
-    '            If deleteConfirmationInput = "S" Then
-    '                todoList.DeleteTodo(todoId)
-    '            End If
+                If deleteConfirmationInput = "S" Then
+                    todoList.DeleteTodo(todoId)
+                End If
 
-    '            success = True
-    '        Catch ex As FormatException
-    '            inputError = "ID inválido! Precisa ser um número inteiro maior que 1."
-    '            success = False
-    '        Catch ex As TodoNotFoundException
-    '            inputError = $"Tarefa com ID {todoId} não existe! Tente novamente."
-    '            success = False
-    '        End Try
-    '    End While
+                success = True
+            Catch ex As FormatException
+                inputError = "ID inválido! Precisa ser um número inteiro maior que 1."
+                success = False
+            Catch ex As TodoNotFoundException
+                inputError = $"Tarefa com ID {todoId} não existe! Tente novamente."
+                success = False
+            End Try
+        End While
 
-    'End Sub
+    End Sub
 
 End Module
