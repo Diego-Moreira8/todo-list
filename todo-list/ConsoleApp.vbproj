@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TodoListClassLibrary\ClassLibrary.vbproj" />
+    <ProjectReference Include="..\ClassLibraryNet\ClassLibraryNet.vbproj" />
   </ItemGroup>
 
 </Project>

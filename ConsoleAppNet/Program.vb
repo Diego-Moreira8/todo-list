@@ -1,4 +1,4 @@
-Imports ClassLibraryNet
+Imports ClassLibrary
 
 Module Program
 

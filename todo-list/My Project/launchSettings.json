@@ -2,6 +2,9 @@
   "profiles": {
     "todo-list": {
       "commandName": "Project"
+    },
+    "WebApp": {
+      "commandName": "Project"
     }
   }
 }
