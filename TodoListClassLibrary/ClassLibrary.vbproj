@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>todo_list</RootNamespace>
+    <RootNamespace>TodoListClassLibrary</RootNamespace>
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
 

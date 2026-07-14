@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="todo-list/todo-list.vbproj" />
+  <Project Path="todo-list/ConsoleApp.vbproj" />
+  <Project Path="TodoListClassLibrary/ClassLibrary.vbproj" Id="b7f31ff3-11c9-48f7-ac32-9a488f94494b" />
+  <Project Path="WebApp/WebApp.vbproj" Id="7148b36e-967e-4fa4-8140-afbb4b4eb753" />
 </Solution>

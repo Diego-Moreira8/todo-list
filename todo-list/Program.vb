@@ -1,18 +1,20 @@
-Imports System.Data
-Imports Microsoft.Data.SqlClient
+Imports TodoListClassLibrary
 
 Module Program
 
     ReadOnly todoList = New TodoList()
 
-    Sub Main(args As String())
+    Sub Main()
 
         AppMainLoop()
 
     End Sub
 
+    ''' <summary>
+    '''Mantém o programa rodando enquanto o usuário não escolher sair
+    ''' </summary>
     Sub AppMainLoop()
-        'Mantém o programa rodando enquanto o usuário não escolher sair
+
 
         Dim optionInput As String
         Dim inputError As String = ""
@@ -49,10 +51,16 @@ Module Program
 
     End Sub
 
+    ''' <summary>
+    ''' Limpa o console e renderiza o cabeçalho.
+    ''' </summary>
+    ''' <param name="menuTitle">Título que será exibido abaixo da lista de tarefas.</param>
+    ''' <param name="idOfSelectedTodo">ID da tarefa selecionada. Será indicada com um * na interface.</param>
+    ''' <remarks>
+    ''' O cabaçalho também mostra a lista de tarefas atual.
+    ''' </remarks>
     Sub ReloadHeader(menuTitle As String, Optional idOfSelectedTodo As Integer = 0)
 
-        'Limpa o console e renderiza o cabeçalho
-        'O cabaçalho mostra a lista de tarefas atual
 
         Console.Clear()
 
@@ -67,7 +75,6 @@ Module Program
 
     Sub RenderMainMenu(inputError As String)
 
-        'TODO: editar e apagar item
         Dim menuOptions As String() = {
             "Sair (e salvar alterações na base de dados)",
             "Adicionar tarefa",
